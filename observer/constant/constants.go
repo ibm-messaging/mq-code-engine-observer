@@ -18,155 +18,225 @@ package constant
 
 import (
 	"os"
-	"testing"
+	"strconv"
+	"strings"
 	"time"
 
 	"observer/common"
 )
 
-func Test_defaultIntervals(t *testing.T) {
-	resultCheck := map[string]time.Duration{
-		KEY_NOTIFY_SLEEP_INTERVAL: default_sleep_interval,
-		KEY_PERSIST_INTERVAL:      default_persist_interval,
-		KEY_RESTORE_INTERVAL:      default_restore_monitor_interval,
-		KEY_BACKOFF_DURATION:      default_backoff_duration,
-	}
+const ID = "ID"
+const QMGR = "QMGR"
+const QUEUE = "QUEUE"
+const NOTIFY = "NOTIFY"
 
-	if resultCheck[KEY_NOTIFY_SLEEP_INTERVAL] != default_sleep_interval {
-		t.Fatal("test map failing")
-	}
+const CE_QMGR = "CE_QMGR"
+const CE_QUEUE = "CE_QUEUE"
+const QUEUE_DEPTH = "CE_DEPTH"
 
-	for key, checkInterval := range resultCheck {
-		if interval := DetermineInterval(key); interval != checkInterval {
-			t.Errorf("incorrect interval for %s: expected %s, got %s", key, checkInterval, interval)
-		}
-	}
-}
+const MAX_MQ_POINTS = 20
 
-func Test_defaultTestIntervals(t *testing.T) {
-	t.Setenv(key_running_test_mode, "Y")
+// These key values can be used to override values used
+// in the observer application
+// Lowercase names are not exported.
+const KEY_ENV_FILE = "EnvFile"
+const KEY_PORT = "PORT"
 
-	resultCheck := map[string]time.Duration{
-		KEY_NOTIFY_SLEEP_INTERVAL: default_test_sleep_interval,
-		KEY_PERSIST_INTERVAL:      default_test_persist_interval,
-		KEY_RESTORE_INTERVAL:      default_test_restore_monitor_interval,
-		KEY_BACKOFF_DURATION:      default_test_backoff_duration,
-	}
+const KEY_NOTIFY_SLEEP_INTERVAL = "NOTIFY_INTERVAL"
+const KEY_PERSIST_INTERVAL = "PERSIST_INTERVAL"
+const KEY_RESTORE_INTERVAL = "RESTORE_INTERVAL"
+const KEY_BACKOFF_DURATION = "BACKOFF_DURATION"
+const KEY_CODEENGINE_REFRESH_DURATION = "CE_REFRESH_INTERVAL"
 
-	if resultCheck[KEY_NOTIFY_SLEEP_INTERVAL] != default_test_sleep_interval {
-		t.Fatal("test map failing")
-	}
+const key_running_test_mode = "TEST"
+const key_drop_bad = "DROP_BAD"
 
-	for key, checkInterval := range resultCheck {
-		if interval := DetermineInterval(key); interval != checkInterval {
-			t.Errorf("incorrect interval for %s: expected %s, got %s", key, checkInterval, interval)
-		}
-	}
-}
+const key_no_cos = "NO_COS"
+const use_cos_storage = true
 
-func Test_environmentOverriddenIntervals(t *testing.T) {
-	t.Setenv(key_running_test_mode, "Y")
-	t.Setenv(KEY_NOTIFY_SLEEP_INTERVAL, "1")
-	t.Setenv(KEY_PERSIST_INTERVAL, "20")
-	t.Setenv(KEY_RESTORE_INTERVAL, "300")
-	t.Setenv(KEY_CODEENGINE_REFRESH_DURATION, "40")
-	t.Setenv(KEY_BACKOFF_DURATION, "5000")
+const key_http_poker = "HTTP_NOTIFY"
+const key_cloudevent_poker = "CLOUD_EVENTS"
+const use_cloudevents = true
 
-	resultCheck := map[string]time.Duration{
-		KEY_NOTIFY_SLEEP_INTERVAL:       1 * time.Minute,
-		KEY_PERSIST_INTERVAL:            20 * time.Minute,
-		KEY_RESTORE_INTERVAL:            300 * time.Minute,
-		KEY_CODEENGINE_REFRESH_DURATION: 40 * time.Minute,
-		KEY_BACKOFF_DURATION:            5000 * time.Minute,
-	}
+const key_enable_reservations = "ENABLE_RESERVATIONS"
+const key_enable_notifications = "ENABLE_NOTIFICATIONS"
+const key_enable_all = "ENABLE_ALL"
 
-	if resultCheck[KEY_NOTIFY_SLEEP_INTERVAL] != 1*time.Minute {
-		t.Fatal("test map failing")
-	}
+// Keys to retrieve MQ instances
+const KEY_ADMIN_USER = "ADMIN_USER"
+const KEY_ADMIN_PASSWORD = "ADMIN_PASSWORD"
+const KEY_QMGR = "QMGR"
+const KEY_MQ_HOST = "MQ_REST_HOST"
+const KEY_MQ_PORT = "MQ_REST_PORT"
 
-	for key, checkInterval := range resultCheck {
-		if interval := DetermineInterval(key); interval != checkInterval {
-			t.Errorf("incorrect interval for %s: expected %s, got %s", key, checkInterval, interval)
-		}
-	}
-}
+// Keys for COS persist of registrations
+const KEY_COS_STORAGE = "COS_STORAGE"
+const KEY_COS_BUCKET = "bucket"
+const KEY_COS_APIKEY = "cos_apikey"
+const KEY_COS_ENDPOINTS = "endpoints"
+const KEY_COS_INSTANCE_ID = "resource_instance_id"
+const KEY_COS_AUTH_ENDPOINT = "auth_endpoint"
 
-func Test_defaultFailBoundaries(t *testing.T) {
-	lowFail := default_fail_tolerance - 1
-	highFail := default_fail_tolerance
+const DEFAULT_COS_AUTH_ENDPOINT = "https://iam.cloud.ibm.com/identity/token"
 
-	if tolerance := FailTolerance(); tolerance != default_fail_tolerance {
-		t.Errorf("incorrect default fail tolerance expected %d, got %d", default_fail_tolerance, tolerance)
-	}
+// Keys for Cloud Engine API
+const KEY_CE_APIKEY = "ce_apikey"
+const KEY_CE_AUTH_ENDPOINT = "auth_endpoint"
+const KEY_CE_CLIENT_ID = "client_id"
+const KEY_CE_SECRET = "client_secret"
 
-	if IsFailureExcessive(lowFail) {
-		t.Errorf("%d should not register has excessive failures checking against %d", lowFail, default_fail_tolerance)
-	}
+// const KEY_CE_REGION = "region"
+const KEY_CE_REGIONS = "regions"
 
-	if !IsFailureExcessive(highFail) {
-		t.Errorf("%d should register has excessive failures checking against %d", highFail, default_fail_tolerance)
-	}
-}
+const KEY_REG_SEED_DATA = "seeddata"
 
-func Test_testingFailBoundaries(t *testing.T) {
-	lowFail := default_test_fail_tolerance - 1
-	highFail := default_test_fail_tolerance
+const DEFAULT_CLIENT_ID = "bx"
+const DEFAULT_CLIENT_SECRET = "bx"
+const DEFAULT_CE_AUTH_ENDPOINT = "https://iam.cloud.ibm.com"
 
-	t.Setenv(key_running_test_mode, "Y")
+// CloudEvents related constants
+const CLOUDEVENT_SOURCE = "mq-observer"
+const CLOUDEVENT_TYPE = "queue-messages"
 
-	if tolerance := FailTolerance(); tolerance != default_test_fail_tolerance {
-		t.Errorf("incorrect test fail tolerance expected %d, got %d", default_test_fail_tolerance, tolerance)
-	}
+// default timings, under normal and development runnings.
+const default_sleep_interval = 5 * time.Minute
 
-	if IsFailureExcessive(lowFail) {
-		t.Errorf("%d should not register has excessive failures checking against %d", lowFail, default_test_fail_tolerance)
-	}
+// ***
+const default_test_sleep_interval = 30 * time.Second
 
-	if !IsFailureExcessive(highFail) {
-		t.Errorf("%d should register has excessive failures checking against %d", highFail, default_test_fail_tolerance)
-	}
-}
+//const default_test_sleep_interval = 2 * time.Minute
 
-func Test_testingPokerCheck(t *testing.T) {
-	if pokerType := DeterminePokerType(); common.CloudEvents != pokerType {
-		if use_cloudevents {
-			t.Error("Notification poker type should default to CloudEvents")
-		}
-	}
+const default_persist_interval = 10 * time.Minute
 
-	t.Setenv(key_http_poker, "Y")
-	if pokerType := DeterminePokerType(); common.HttpEvents != pokerType {
-		if use_cloudevents {
-			t.Error("Notification poker type should have been set to HttpEvents")
-		}
-	}
+// ***
+const default_test_persist_interval = 2 * time.Minute
 
-	t.Setenv(key_cloudevent_poker, "Y")
-	if pokerType := DeterminePokerType(); common.CloudEvents != pokerType {
-		if use_cloudevents {
-			t.Error("Cloud event setting should trump http event setting")
+//const default_test_persist_interval = 30 * time.Second
+
+const default_restore_monitor_interval = 1 * time.Hour
+const default_test_restore_monitor_interval = 3 * time.Minute
+
+const default_fail_tolerance = 10
+const default_test_fail_tolerance = 2
+
+const default_backoff_duration = 24 * time.Hour
+const default_test_backoff_duration = 4 * time.Minute
+
+const default_test_ce_refresh_duration = 5 * time.Minute
+const default_ce_refresh_duration = 10 * time.Minute
+
+const drop_bad_registrations = false
+
+const MAX_NOSTORE_ITERATIONS = 2 // 10
+
+const DEFAULT_ENV_FILE = "./env.json"
+
+const MQ_QUERY_CONSTRUCT = "/ibmmq/rest/v1/admin/qmgr/"
+const MQ_QUERY_PARAMS = "?status=status.currentDepth"
+
+func DetermineInterval(key string) time.Duration {
+	key = strings.ToUpper(key)
+	_, runningInTest := os.LookupEnv(key_running_test_mode)
+
+	if s, ok := os.LookupEnv(key); ok {
+		if i, err := strconv.Atoi(s); nil == err {
+			return time.Duration(i) * time.Minute
 		}
 	}
 
+	switch key {
+	case KEY_PERSIST_INTERVAL:
+		if runningInTest {
+			return default_test_persist_interval
+		} else {
+			return default_persist_interval
+		}
+	case KEY_RESTORE_INTERVAL:
+		if runningInTest {
+			return default_test_restore_monitor_interval
+		} else {
+			return default_restore_monitor_interval
+		}
+	case KEY_BACKOFF_DURATION:
+		if runningInTest {
+			return default_test_backoff_duration
+		} else {
+			return default_backoff_duration
+		}
+	case KEY_CODEENGINE_REFRESH_DURATION:
+		if runningInTest {
+			return default_test_ce_refresh_duration
+		} else {
+			return default_ce_refresh_duration
+		}
+	}
+
+	if runningInTest {
+		return default_test_sleep_interval
+	} else {
+		return default_sleep_interval
+	}
 }
 
-func Test_runMode(t *testing.T) {
-	if mode := DetermineRunMode(); common.AllFunctions != mode {
-		t.Errorf("Run mode: wrong default mode of %d, got %d", common.AllFunctions, mode)
+func DropBadRegistrations() bool {
+	if 0 < len(os.Getenv(key_drop_bad)) {
+		return true
+	} else {
+		return drop_bad_registrations
+	}
+}
+
+func UseCOSStorage() bool {
+	if 0 < len(os.Getenv(key_no_cos)) {
+		return false
+	} else {
+		return use_cos_storage
+	}
+}
+
+func DetermineRunMode() common.RunMode {
+	enableHttp := (0 < len(os.Getenv(key_enable_reservations)))
+	enableNotifications := (0 < len(os.Getenv(key_enable_notifications)))
+	//enableAll := (0 < len(os.Getenv(key_enable_all)))
+
+	if enableHttp && !enableNotifications {
+		return common.ReservationsOnly
+	} else if !enableHttp && enableNotifications {
+		return common.NotifcationOnly
 	}
 
-	t.Setenv(key_enable_reservations, "Y")
-	if mode := DetermineRunMode(); common.ReservationsOnly != mode {
-		t.Errorf("Run mode: wrong reservations mode of %d, got %d", common.ReservationsOnly, mode)
+	//Default to combined mode
+	return common.AllFunctions
+}
+
+func DeterminePokerType() common.NotificationPoker {
+	// If requested CloudEvents overrides
+	// https://cloudevents.io
+	if 0 < len(os.Getenv(key_cloudevent_poker)) {
+		return common.CloudEvents
+	} else if 0 < len(os.Getenv(key_http_poker)) {
+		return common.HttpEvents
+	} else if use_cloudevents {
+		// check compile time constants for cloudevents
+		return common.CloudEvents
 	}
 
-	t.Setenv(key_enable_notifications, "Y")
-	if mode := DetermineRunMode(); common.AllFunctions != mode {
-		t.Errorf("Run mode: wrong all functions mode mode of %d, got %d", common.AllFunctions, mode)
-	}
+	// Default to HTTP if nothing explicit is requested
+	return common.HttpEvents
+}
 
-	os.Unsetenv(key_enable_reservations)
-	if mode := DetermineRunMode(); common.NotifcationOnly != mode {
-		t.Errorf("Run mode: wrong notifications mode of %d, got %d", common.NotifcationOnly, mode)
+func IsFailureExcessive(fails int) bool {
+	tolerance := default_fail_tolerance
+	if _, runningInTest := os.LookupEnv(key_running_test_mode); runningInTest {
+		tolerance = default_test_fail_tolerance
 	}
+	return tolerance <= fails
+}
+
+func FailTolerance() int {
+	tolerance := default_fail_tolerance
+	if _, runningInTest := os.LookupEnv(key_running_test_mode); runningInTest {
+		tolerance = default_test_fail_tolerance
+	}
+	return tolerance
 }

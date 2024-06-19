@@ -51,7 +51,7 @@ func Test_checkMQGoodEnvConfiguration(t *testing.T) {
 	eps.LoadMQEndpoints()
 
 	if numPoints := len(eps.obsConfig.Points); 2 != numPoints {
-		t.Fatalf("Good Env Test: Incorrect number of points detected expected %d, got %d", 0, numPoints)
+		t.Fatalf("Good Env Test: Incorrect number of points detected expected %d, got %d", 2, numPoints)
 	}
 
 	if user := eps.obsConfig.Points[0].User; dummyUser != user {

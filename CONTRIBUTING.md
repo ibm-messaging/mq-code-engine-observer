@@ -43,7 +43,7 @@ To verify the new upstream repository you have specified for your fork, run the 
 git remote -v
 ```
 
-You should see the URL for your fork as origin, and the URL for the repository as upstream.
+You should see the URL for your fork as origin, and the URL for our repository as upstream.
 
 Now, you can work locally and commit to your changes to your fork. This will not impact the main branch.
 
@@ -102,6 +102,8 @@ git add -A
 
 Alternatively, you can type _git add -all_ for all new files to be staged. 
 
+Make sure that no binaries that get built are included in the pull request.
+
 Once you are ready to submit your changes, ensure that you commit them to your fork with a message. The commit message is an important aspect of your code contribution; it helps the maintainers and other contributors to fully understand the change you have made, why you made it, and how significant it is. 
 
 You can commit your changes by running: 
@@ -128,11 +130,10 @@ git merge upstream/main
 
 Before creating a Pull Request, ensure you have read the [IBM Contributor License Agreement](CLA.md). By creating a PR, you certify that your contribution:
 1. is licensed under Apache Licence Version 2.0, The MIT License, or any BSD License.
-2. does not result in IBM MQ proprietary code being statically or dynamically linked.
 
 Once you have carefully read and agreed to the terms mentioned in the [CLA](CLA.md), you are ready to make a pull request to the original repository.
 
 Navigate to your forked repository and press the _New pull request_ button. Then, you should add a title and a comment to the appropriate fields and then press the _Create pull request_ button.
 
-The maintainers of the original repository will then review your contribution and decide whether or not to accept your pull request.
+The maintainers of our repository will then review your contribution and decide whether or not to accept your pull request.
  

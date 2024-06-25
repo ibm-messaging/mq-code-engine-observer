@@ -16,6 +16,8 @@
 
 BASEDIR="$(dirname "$0")"
 
+CE_PROJECT_SETTING="mq-observer"
+
 OBSERVER_APP_NAME="ce-mq-observer"
 OBSERVER_SECRETS_NAME="observer-secrets"
 OBSERVER_CONFIG_NAME="observer-config"
@@ -28,6 +30,21 @@ RESOURCES_DIR="observer/resources"
 SEED_REGISTRATION_DATA=seeddata
 
 NOTIFY_INTERVAL_SETTING=""
+
+function projectcheck() {
+    echo "Checking Code Engine project"
+
+    if [ ! -z "${CE_PROJECT}" ]; then
+        CE_PROJECT_SETTING="${CE_PROJECT}"
+    fi
+
+    echo "Code Engine project is ${CE_PROJECT_SETTING}"
+    ibmcloud ce project select --name "${CE_PROJECT_SETTING}"
+    if [ $? -ne 0 ]; then
+        ibmcloud ce project create --name "${CE_PROJECT_SETTING}" 
+    fi
+
+}
 
 function check() { 
     echo "Checking envrionment variables"
@@ -125,6 +142,7 @@ function createjobdefinition() {
 
 
 echo "Starting deployment of IBM MQ Observer to Code Engine"
+projectcheck
 clean
 if [ $# -ge 1 ] && [ -n "$1" ] && [ "$1" == "clean" ]
 then

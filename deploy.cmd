@@ -153,7 +153,7 @@ exit /b 0
 
     ibmcloud ce job create --name %CONSUMER_JOB_NAME% ^
         --build-source %BASEDIR% ^
-        --build-dockerfile %BASEDIR%/Dockerfile.consumer ^
+        --build-dockerfile Dockerfile.consumer ^
         --env-from-secret %CONSUMER_SECRETS_NAME%
 exit /b 0
 
@@ -162,7 +162,7 @@ exit /b 0
 
     ibmcloud ce app create --name %OBSERVER_APP_NAME% ^
         --build-source %BASEDIR% ^
-        --build-dockerfile %BASEDIR%/Dockerfile ^
+        --build-dockerfile Dockerfile ^
         --env-from-secret %OBSERVER_SECRETS_NAME% ^
         --env-from-configmap %OBSERVER_CONFIG_NAME% ^
         --min-scale=1 --max-scale=1 --wait

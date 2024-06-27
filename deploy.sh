@@ -133,7 +133,7 @@ function createapp() {
 }
 
 function createjobdefinition() {
-    echo "Creating observer application ${CONSUMER_JOB_NAME}"
+    echo "Creating consumer job definition ${CONSUMER_JOB_NAME}"
     ibmcloud ce job create --name "${CONSUMER_JOB_NAME}" \
         --build-source "${BASEDIR}" \
         --build-dockerfile "${BASEDIR}/Dockerfile.consumer" \

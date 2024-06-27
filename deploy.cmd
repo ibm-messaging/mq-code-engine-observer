@@ -28,6 +28,8 @@ set COS_KEY_SETTING=""
 set RESOURCES_DIR="observer/resources"
 set SEED_REGISTRATION_DATA=seeddata
 
+set NOTIFY_INTERVAL_SETTING=""
+
 echo "Starting deployment of IBM MQ Observer to Code Engine"
 echo Base directory is %BASEDIR%
 
@@ -122,6 +124,9 @@ exit /b 0
         set COS_KEY_SETTING=--from-literal cos_apikey=%cos_apikey%
     ) 
 
+    if defined NOTIFY_INTERVAL (
+        set NOTIFY_INTERVAL_SETTING=--from-literal NOTIFY_INTERVAL=%NOTIFY_INTERVAL%
+    ) 
 
     echo envrionment check is complete
 exit /b 0

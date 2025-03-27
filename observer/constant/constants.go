@@ -128,6 +128,7 @@ const default_ce_refresh_duration = 10 * time.Minute
 
 const drop_bad_registrations = false
 const default_allow_self_signed = false
+const default_test_allow_self_signed = false
 
 const MAX_NOSTORE_ITERATIONS = 2 // 10
 
@@ -184,9 +185,9 @@ func AllowSelfSigned() bool {
 	if 0 < len(os.Getenv(key_allow_self_signed)) {
 		return true
 	} else if _, runningInTest := os.LookupEnv(key_running_test_mode); runningInTest {
-		return default_allow_self_signed
+		return default_test_allow_self_signed
 	}
-	return false
+	return default_allow_self_signed
 }
 
 func DropBadRegistrations() bool {

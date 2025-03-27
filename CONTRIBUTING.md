@@ -83,7 +83,7 @@ podman run --rm  --env CE_QMGR=QM1 --env CE_QUEUE=DEV.QUEUE.2 localhost/mq-consu
 ```
 
 #### Testing with a containerised queue manager
-If you are testing with a default containerised queue manager, then it's certificate will be self signed. 
+If you are testing with a default containerised queue manager, then its certificate will be self signed. 
 
 Observer attempts to get queue depths will fail with 
 

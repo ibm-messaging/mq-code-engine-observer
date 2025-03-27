@@ -17,6 +17,7 @@
 package notifications
 
 import (
+	"crypto/tls"
 	"fmt"
 	"strings"
 	"time"
@@ -37,7 +38,13 @@ type invoker struct {
 }
 
 func (i *invoker) createClient() {
-	i.client = &http.Client{Timeout: 30 * time.Second}
+	if constant.AllowSelfSigned() {
+		customTransport := http.DefaultTransport.(*http.Transport).Clone()
+		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		i.client = &http.Client{Timeout: 30 * time.Second, Transport: customTransport}
+	} else {
+		i.client = &http.Client{Timeout: 30 * time.Second}
+	}
 }
 
 // func (i *invoker) pokerDecided(eventNotifier poker) {

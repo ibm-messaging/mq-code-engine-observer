@@ -50,6 +50,7 @@ const KEY_CODEENGINE_REFRESH_DURATION = "CE_REFRESH_INTERVAL"
 
 const key_running_test_mode = "TEST"
 const key_drop_bad = "DROP_BAD"
+const key_allow_self_signed = "ALLOW_SELF_SIGNED"
 
 const key_no_cos = "NO_COS"
 const use_cos_storage = true
@@ -126,6 +127,7 @@ const default_test_ce_refresh_duration = 5 * time.Minute
 const default_ce_refresh_duration = 10 * time.Minute
 
 const drop_bad_registrations = false
+const default_allow_self_signed = false
 
 const MAX_NOSTORE_ITERATIONS = 2 // 10
 
@@ -176,6 +178,15 @@ func DetermineInterval(key string) time.Duration {
 	} else {
 		return default_sleep_interval
 	}
+}
+
+func AllowSelfSigned() bool {
+	if 0 < len(os.Getenv(key_allow_self_signed)) {
+		return true
+	} else if _, runningInTest := os.LookupEnv(key_running_test_mode); runningInTest {
+		return default_allow_self_signed
+	}
+	return false
 }
 
 func DropBadRegistrations() bool {

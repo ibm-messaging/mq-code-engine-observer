@@ -38,13 +38,11 @@ type invoker struct {
 }
 
 func (i *invoker) createClient() {
+	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	if constant.AllowSelfSigned() {
-		customTransport := http.DefaultTransport.(*http.Transport).Clone()
 		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-		i.client = &http.Client{Timeout: 30 * time.Second, Transport: customTransport}
-	} else {
-		i.client = &http.Client{Timeout: 30 * time.Second}
 	}
+	i.client = &http.Client{Timeout: 30 * time.Second, Transport: customTransport}
 }
 
 // func (i *invoker) pokerDecided(eventNotifier poker) {

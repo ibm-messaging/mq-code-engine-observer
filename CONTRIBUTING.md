@@ -82,6 +82,17 @@ podman run --rm  --env TEST=1 --rm localhost/mq-observer:latest
 podman run --rm  --env CE_QMGR=QM1 --env CE_QUEUE=DEV.QUEUE.2 localhost/mq-consumer:latest
 ```
 
+#### Testing with a containerised queue manager
+If you are testing with a default containerised queue manager, then its certificate will be self signed. 
+
+Observer attempts to get queue depths will fail with 
+
+```
+tls: failed to verify certificate: x509: certificate signed by unknown authority"
+```
+
+To test against such queue managers run with the envrionment option `ALLOW_SELF_SIGNED=1`
+
 ### 3. Run deploy script
 Run the `.deploy.sh` to ensure that the observer application and sample consumer job and the associated secrets and configmaps are created and start. 
 

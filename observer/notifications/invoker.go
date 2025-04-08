@@ -1,5 +1,5 @@
 /**
- * Copyright 2024 IBM Corp.
+ * Copyright 2024, 2025 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package notifications
 
 import (
+	"crypto/tls"
 	"fmt"
 	"strings"
 	"time"
@@ -37,7 +38,11 @@ type invoker struct {
 }
 
 func (i *invoker) createClient() {
-	i.client = &http.Client{Timeout: 30 * time.Second}
+	customTransport := http.DefaultTransport.(*http.Transport).Clone()
+	if constant.AllowSelfSigned() {
+		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+	i.client = &http.Client{Timeout: 30 * time.Second, Transport: customTransport}
 }
 
 // func (i *invoker) pokerDecided(eventNotifier poker) {
